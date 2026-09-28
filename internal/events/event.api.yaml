@@ -1,0 +1,222 @@
+openapi: 3.0.3
+
+info:
+  title: Event Processing Platform
+  version: 1.0.0
+
+paths:
+
+  /events:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+      responses:
+        '200':
+          description: Create event
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - success
+                  - message
+                properties:
+                  status:
+                    type: string
+                  success:
+                    type: boolean
+                  message:
+                    type: string 
+                  data:
+                    $ref: '#/components/schemas/Event'
+
+    get:
+      summary: List of events
+      parameters:
+        - name: provider
+          in: query
+          required: false
+          description: Filter events by provider
+          schema:
+            type: string
+        - name: event_type
+          in: query
+          required: false
+          description: Filter events by event type
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          description: Limit the number of events returned
+          schema:
+            type: integer
+            default: 10
+        - name: page
+          in: query
+          required: false
+          description: Offset for pagination
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - success
+                  - message
+                properties:
+                  status:
+                    type: string
+                  success:
+                    type: boolean
+                  message:
+                    type: string 
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Event'
+
+  /events/{id}:
+    get:
+      summary: Get single event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique id of the event
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Event details
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - success
+                  - message
+                properties:
+                  status:
+                    type: string
+                  success:
+                    type: boolean
+                  message:
+                    type: string 
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          description: Invalid request
+    put:
+      summary: Update event status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The unique id of the event
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateEventStatusRequest'
+
+      responses:
+        '200':
+          description: Event accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                  - success
+                  - message
+                properties:
+                  status:
+                    type: string
+                  success:
+                    type: boolean
+                  message:
+                    type: string 
+                  data:
+                    $ref: '#/components/schemas/Event'
+
+        '400':
+          description: Invalid request
+
+components:
+
+  schemas:
+
+    CreateEventRequest:
+      type: object
+      required:
+        - provider
+        - event_type
+      properties:
+        provider:
+          type: string
+        event_type:
+          type: string
+        payload:
+          type: object
+    Event:
+      type: object
+      required:
+        - id
+        - provider
+        - event_type
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        provider:
+          type: string
+        event_type:
+          type: string
+        payload:
+          type: object
+        status:
+          type: string
+          enum:
+            - pending
+            - processing
+            - processed
+            - failed
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpdateEventStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - pending
+            - processing
+            - processed
+            - failed
+

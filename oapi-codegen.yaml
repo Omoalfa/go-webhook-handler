@@ -1,0 +1,6 @@
+# oapi-codegen.yaml
+generate:
+  chi-server: true    # Generates go-chi routing boilerplate
+  models: true        # Generates struct models for requests/responses
+  strict-server: true # Strongly typed request/response wrappers (recommended)
+  embedded-spec: true # Embeds the OpenAPI definition inside the generated code
